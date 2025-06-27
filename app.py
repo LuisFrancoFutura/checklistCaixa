@@ -7,6 +7,7 @@ import datetime
 import io
 from docx import Document
 from docx.shared import Inches
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -121,84 +122,88 @@ def load_css():
 # --- Funções de Geração de Relatório ---
 
 def get_report_data(ticket_id):
-    """Coleta os dados do formulário e retorna uma lista de strings formatadas."""
+    """Coleta os dados do formulário e retorna uma lista de strings formatadas no layout solicitado."""
     agencia = st.session_state.get(f'agencia_{ticket_id}', '')
     cidade_uf = st.session_state.get(f'cidade_uf_{ticket_id}', '')
     endereco = st.session_state.get(f'endereco_{ticket_id}', '')
     num_racks = st.session_state.get(f'num_racks_{ticket_id}', 1)
     
+    # Usa marcadores especiais (ex: TITLE:) para ajudar na formatação dos arquivos PDF e DOCX
     report_lines = [
-        "===============================================",
-        "           Check list Caixa Econômica",
-        "===============================================",
-        f"Chamado: {ticket_id.upper()}\n",
-        "--- INFORMAÇÕES GERAIS DA AGÊNCIA ---",
+        "TITLE: Check list Caixa Econômica",
+        "",
         f"Agência: {agencia}",
         f"Cidade/UF: {cidade_uf}",
         f"Endereço: {endereco}",
-        f"Quantidade de Racks na agência: {num_racks}\n",
+        f"Quantidade de Rack na agência: {num_racks}",
+        "",
     ]
 
     for i in range(1, num_racks + 1):
-        report_lines.append(f"--- DETALHES DO RACK {i} ---")
+        report_lines.append(f"SUBTITLE: Rack {i}:")
         report_lines.append(f"Local instalado: {st.session_state.get(f'rack_local_{i}_{ticket_id}', '')}")
-        report_lines.append(f"Tamanho do Rack (U's): {st.session_state.get(f'rack_tamanho_{i}_{ticket_id}', 0)}")
-        report_lines.append(f"U's disponíveis: {st.session_state.get(f'rack_us_disponiveis_{i}_{ticket_id}', 0)}")
+        report_lines.append(f"Tamanho do Rack {i} – Número de Us: {st.session_state.get(f'rack_tamanho_{i}_{ticket_id}', 0)}")
+        report_lines.append(f"Quantidade de Us disponíveis: {st.session_state.get(f'rack_us_disponiveis_{i}_{ticket_id}', 0)}")
         report_lines.append(f"Quantidade de réguas de energia: {st.session_state.get(f'rack_reguas_{i}_{ticket_id}', 0)}")
-        report_lines.append(f"Tomadas disponíveis: {st.session_state.get(f'rack_tomadas_disponiveis_{i}_{ticket_id}', 0)}")
-        report_lines.append(f"Disponibilidade para ampliação de réguas: {st.session_state.get(f'rack_ampliacao_reguas_{i}_{ticket_id}', 'Não')}")
+        report_lines.append(f"Quantidade de tomadas disponíveis: {st.session_state.get(f'rack_tomadas_disponiveis_{i}_{ticket_id}', 0)}")
+        report_lines.append(f"Disponibilidade para ampliação de réguas de energia: {st.session_state.get(f'rack_ampliacao_reguas_{i}_{ticket_id}', 'Não')}")
         report_lines.append(f"Rack está em bom estado: {st.session_state.get(f'rack_estado_{i}_{ticket_id}', 'Não')}")
         report_lines.append(f"Rack está organizado: {st.session_state.get(f'rack_organizado_{i}_{ticket_id}', 'Não')}")
-        report_lines.append(f"Equipamentos e cabos identificados: {st.session_state.get(f'rack_identificado_{i}_{ticket_id}', 'Não')}\n")
+        report_lines.append(f"Equipamentos e cabeamentos identificados: {st.session_state.get(f'rack_identificado_{i}_{ticket_id}', 'Não')}")
+        report_lines.append("")
 
-    report_lines.append("--- INFORMAÇÕES SOBRE ACCESS POINT (AP) ---")
-    report_lines.append(f"Quantidade de APs existentes: {st.session_state.get(f'ap_quantidade_{ticket_id}', 0)}")
-    report_lines.append(f"Setor para instalação do novo AP: {st.session_state.get(f'ap_setor_{ticket_id}', '')}")
-    report_lines.append(f"Condições da infraestrutura: {st.session_state.get(f'ap_condicoes_{ticket_id}', '')}")
-    report_lines.append(f"Altura de instalação / Distância do rack: {st.session_state.get(f'ap_distancia_{ticket_id}', '')}\n")
-    report_lines.append("===============================================")
-
+    report_lines.append("SUBTITLE: Access Point (AP)")
+    report_lines.append("")
+    report_lines.append(f"Verificar a quantidade de APs: {st.session_state.get(f'ap_quantidade_{ticket_id}', 0)}")
+    report_lines.append(f"Identificar o setor onde será instalado*: {st.session_state.get(f'ap_setor_{ticket_id}', '')}")
+    report_lines.append(f"Verificar as condições da Instalação (se possui infra ou não): {st.session_state.get(f'ap_condicoes_{ticket_id}', '')}")
+    report_lines.append(f"** Altura que será instalado / distância do rack até o ponto de instalação: {st.session_state.get(f'ap_distancia_{ticket_id}', '')}")
+    
     return report_lines
 
 def create_pdf_report(ticket_id):
-    """Gera um relatório em PDF em memória."""
+    """Gera um relatório em PDF em memória com o novo layout."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=inch, leftMargin=inch, topMargin=inch, bottomMargin=inch)
     styles = getSampleStyleSheet()
     
-    # Estilo para o corpo do texto
-    body_style = ParagraphStyle(name='Body', parent=styles['Normal'], fontName='Helvetica', fontSize=10, leading=14)
-    # Estilo para títulos de seção
-    header_style = ParagraphStyle(name='Header', parent=styles['h3'], fontName='Helvetica-Bold', fontSize=12, spaceAfter=6)
+    # Estilos customizados para o novo layout
+    title_style = ParagraphStyle(name='Title', parent=styles['h1'], fontName='Helvetica-Bold', fontSize=14, alignment=TA_CENTER, spaceAfter=20)
+    subtitle_style = ParagraphStyle(name='Subtitle', parent=styles['h2'], fontName='Helvetica-Bold', fontSize=12, alignment=TA_LEFT, spaceAfter=10)
+    body_style = ParagraphStyle(name='Body', parent=styles['Normal'], fontName='Helvetica', fontSize=10, leading=14, spaceAfter=4)
 
     story = []
     report_lines = get_report_data(ticket_id)
 
-    # Adiciona as linhas ao PDF com formatação
+    # Adiciona as linhas ao PDF com formatação baseada nos marcadores
     for line in report_lines:
-        if line.startswith("---"):
-            story.append(Spacer(1, 0.2*inch))
-            story.append(Paragraph(line.replace("---", "").strip(), header_style))
-        elif line.startswith("==="):
-             story.append(Paragraph("________________________________________________", body_style))
+        if line.startswith("TITLE:"):
+            story.append(Paragraph(line.replace("TITLE:", "").strip(), title_style))
+        elif line.startswith("SUBTITLE:"):
+            story.append(Paragraph(line.replace("SUBTITLE:", "").strip(), subtitle_style))
+        elif line.strip() == "":
+            story.append(Spacer(1, 0.1*inch))
         else:
-            story.append(Paragraph(line, body_style))
+            story.append(Paragraph(line.replace("<br>", "&nbsp;<br/>&nbsp;"), body_style))
     
     doc.build(story)
     buffer.seek(0)
     return buffer
 
 def create_docx_report(ticket_id):
-    """Gera um relatório em Word (.docx) em memória."""
+    """Gera um relatório em Word (.docx) em memória com o novo layout."""
     document = Document()
     report_lines = get_report_data(ticket_id)
 
-    # Adiciona as linhas ao documento Word
+    # Adiciona as linhas ao documento Word com formatação baseada nos marcadores
     for line in report_lines:
-        if line.startswith("---"):
-            document.add_heading(line.replace("---", "").strip(), level=2)
-        elif line.startswith("===") or line.strip() == "":
-            continue # Ignora separadores e linhas em branco para um docx mais limpo
+        if line.startswith("TITLE:"):
+            p = document.add_paragraph()
+            p.add_run(line.replace("TITLE:", "").strip()).bold = True
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        elif line.startswith("SUBTITLE:"):
+            p = document.add_paragraph()
+            p.add_run(line.replace("SUBTITLE:", "").strip()).bold = True
         else:
             document.add_paragraph(line)
             
@@ -229,29 +234,26 @@ def display_checklist(ticket_id):
         st.markdown(f"**Rack {i}**")
         c1, c2 = st.columns(2)
         with c1:
-            st.text_input("Local instalado", key=f'rack_local_{i}_{ticket_id}')
-            st.number_input("Tamanho do Rack (Número de U's)", min_value=0, step=1, key=f'rack_tamanho_{i}_{ticket_id}')
-            st.number_input("Quantidade de U's disponíveis", min_value=0, step=1, key=f'rack_us_disponiveis_{i}_{ticket_id}')
-            st.number_input("Quantidade de réguas de energia", min_value=0, step=1, key=f'rack_reguas_{i}_{ticket_id}')
-            st.number_input("Quantidade de tomadas disponíveis", min_value=0, step=1, key=f'rack_tomadas_disponiveis_{i}_{ticket_id}')
+            st.text_input(f"Local instalado", key=f'rack_local_{i}_{ticket_id}')
+            st.number_input(f"Tamanho do Rack {i} – Número de Us", min_value=0, step=1, key=f'rack_tamanho_{i}_{ticket_id}')
+            st.number_input(f"Quantidade de Us disponíveis", min_value=0, step=1, key=f'rack_us_disponiveis_{i}_{ticket_id}')
+            st.number_input(f"Quantidade de réguas de energia", min_value=0, step=1, key=f'rack_reguas_{i}_{ticket_id}')
+            st.number_input(f"Quantidade de tomadas disponíveis", min_value=0, step=1, key=f'rack_tomadas_disponiveis_{i}_{ticket_id}')
         with c2:
-            st.radio("Disponibilidade para ampliação de réguas", ("Sim", "Não"), key=f'rack_ampliacao_reguas_{i}_{ticket_id}', horizontal=True)
+            st.radio("Disponibilidade para ampliação de réguas de energia", ("Sim", "Não"), key=f'rack_ampliacao_reguas_{i}_{ticket_id}', horizontal=True)
             st.radio("Rack está em bom estado", ("Sim", "Não"), key=f'rack_estado_{i}_{ticket_id}', horizontal=True)
             st.radio("Rack está organizado", ("Sim", "Não"), key=f'rack_organizado_{i}_{ticket_id}', horizontal=True)
-            st.radio("Equipamentos e cabos identificados", ("Sim", "Não"), key=f'rack_identificado_{i}_{ticket_id}', horizontal=True)
+            st.radio("Equipamentos e cabeamentos identificados", ("Sim", "Não"), key=f'rack_identificado_{i}_{ticket_id}', horizontal=True)
         if i < num_racks:
             st.markdown("---")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("Access Point (AP)")
-    col1_ap, col2_ap = st.columns(2)
-    with col1_ap:
-        st.number_input("Verificar a quantidade de APs existentes", min_value=0, step=1, key=f'ap_quantidade_{ticket_id}')
-        st.text_input("Identificar o setor onde será instalado*", help="Setor onde o novo AP ficará", key=f'ap_setor_{ticket_id}')
-    with col2_ap:
-        st.text_input("Verificar as condições da Instalação", help="Ex: Possui infra, não possui, precisa de canaleta, etc.", key=f'ap_condicoes_{ticket_id}')
-        st.text_input("Altura / Distância do rack*", help="Ex: Teto 2.8m / 15m de distância do rack", key=f'ap_distancia_{ticket_id}')
+    st.text_input("Verificar a quantidade de APs", key=f'ap_quantidade_{ticket_id}')
+    st.text_input("Identificar o setor onde será instalado*", help="Setor onde o novo AP ficará", key=f'ap_setor_{ticket_id}')
+    st.text_input("Verificar as condições da Instalação (se possui infra ou não)", help="Ex: Possui infra, não possui, precisa de canaleta, etc.", key=f'ap_condicoes_{ticket_id}')
+    st.text_input("** Altura que será instalado / distância do rack até o ponto de instalação", help="Ex: Teto 2.8m / 15m de distância do rack", key=f'ap_distancia_{ticket_id}')
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
@@ -259,11 +261,14 @@ def display_checklist(ticket_id):
     st.subheader("Exportar Relatório")
     file_name_prefix = f"Checklist_{ticket_id.upper()}_{datetime.datetime.now().strftime('%Y%m%d')}"
     
+    # Prepara os dados do TXT removendo os marcadores de formatação
+    txt_data = "\n".join([line.replace("TITLE:", "").replace("SUBTITLE:", "").strip() for line in get_report_data(ticket_id)])
+
     d_col1, d_col2, d_col3 = st.columns(3)
     with d_col1:
         st.download_button(
             label="Baixar .TXT",
-            data="\n".join(get_report_data(ticket_id)),
+            data=txt_data,
             file_name=f"{file_name_prefix}.txt",
             mime="text/plain",
         )
