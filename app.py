@@ -26,7 +26,7 @@ st.set_page_config(
 # --- Constante para o arquivo de histórico ---
 COMPLETED_FILE = "completed_checklists.json"
 
-# --- CSS para um Design Aprimorado e Limpo ---
+# --- CSS para um Design Aprimorado e Responsivo ---
 def load_css():
     """Carrega e injeta o CSS customizado para estilizar a aplicação."""
     css = """
@@ -35,7 +35,7 @@ def load_css():
 
         body, .main {
             font-family: 'Roboto', sans-serif;
-            background-color: #f7f9fc; /* Fundo principal ainda mais claro */
+            background-color: #f7f9fc;
         }
 
         [data-testid="stSidebar"] {
@@ -45,12 +45,12 @@ def load_css():
         }
         
         [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
-             color: #0d2a4b; /* Tom de azul escuro */
+             color: #0d2a4b;
         }
 
         .stButton>button, .stDownloadButton>button {
             border-radius: 8px;
-            padding: 10px 20px;
+            padding: 12px 20px; /* Aumenta o padding para melhor toque */
             font-weight: 500;
             border: 1px solid transparent;
             color: white !important;
@@ -58,7 +58,6 @@ def load_css():
             width: 100%;
         }
 
-        /* Botão Primário (Adicionar/Concluir) */
         .stButton>button[kind="primary"] {
             background-color: #0068c9;
             border-color: #0068c9;
@@ -68,7 +67,6 @@ def load_css():
             border-color: #0058ad;
         }
         
-        /* Botão Secundário (Formulário) */
          .stButton>button[kind="secondary"] {
             background-color: #0068c9;
             border-color: #0068c9;
@@ -79,8 +77,6 @@ def load_css():
             border-color: #0058ad;
         }
 
-
-        /* Botões de Download */
         .stDownloadButton>button {
             background-color: #5c6c7d;
             border-color: #5c6c7d;
@@ -90,7 +86,6 @@ def load_css():
             border-color: #4a5766;
         }
         
-        /* Estilo dos Expanders para substituir os cards */
         [data-testid="stExpander"] {
             background-color: #ffffff;
             border: 1px solid #e6e6e6;
@@ -102,7 +97,7 @@ def load_css():
             font-size: 1.1rem;
             font-weight: 500;
             color: #0d2a4b;
-            padding: 10px 15px;
+            padding: 12px 15px;
         }
         [data-testid="stExpander"] summary:hover {
             background-color: #f7f9fc;
@@ -137,9 +132,35 @@ def load_css():
         
         h1 {
             color: #0d2a4b;
+            font-size: 2.2rem;
         }
         h2, h3 {
              color: #0d2a4b;
+        }
+
+        /* --- Media Queries para Responsividade --- */
+        @media (max-width: 768px) {
+            /* Empilha colunas em telas menores */
+            [data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+            }
+            
+            [data-testid="stHorizontalBlock"] > div {
+                width: 100% !important;
+                margin-bottom: 1rem; /* Adiciona espaço entre itens empilhados */
+            }
+
+            .main .block-container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .st-expander-content {
+                padding: 10px;
+            }
         }
     </style>
     """
@@ -253,7 +274,7 @@ def display_checklist(ticket_id, data_source, is_disabled=False):
     """Renderiza os campos do formulário para um determinado chamado usando expanders."""
     
     with st.expander("Informações Gerais da Agência", expanded=True):
-        col1, col2 = st.columns(2)
+        col1, col2 = st.columns([1, 1])
         with col1:
             st.text_input("Agência", key=f'agencia_{ticket_id}', value=data_source.get('agencia', ''), disabled=is_disabled)
             st.text_input("Endereço", key=f'endereco_{ticket_id}', value=data_source.get('endereco', ''), disabled=is_disabled)
@@ -266,7 +287,7 @@ def display_checklist(ticket_id, data_source, is_disabled=False):
     with st.expander("Detalhes dos Racks"):
         for i in range(1, num_racks + 1):
             st.markdown(f"#### Rack {i}")
-            c1, c2 = st.columns(2)
+            c1, c2 = st.columns([1, 1])
             with c1:
                 st.text_input(f"Local instalado", key=f'rack_local_{i}_{ticket_id}', value=data_source.get(f'rack_local_{i}', ''), disabled=is_disabled)
                 st.text_input(f"Tamanho do Rack {i} – Número de Us", key=f'rack_tamanho_{i}_{ticket_id}', value=data_source.get(f'rack_tamanho_{i}', ''), disabled=is_disabled)
