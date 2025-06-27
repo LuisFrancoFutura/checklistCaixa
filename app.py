@@ -152,6 +152,7 @@ def get_report_data(ticket_id):
         report_lines.append(f"Rack está em bom estado: {st.session_state.get(f'rack_estado_{i}_{ticket_id}', 'Não')}")
         report_lines.append(f"Rack está organizado: {st.session_state.get(f'rack_organizado_{i}_{ticket_id}', 'Não')}")
         report_lines.append(f"Equipamentos e cabeamentos identificados: {st.session_state.get(f'rack_identificado_{i}_{ticket_id}', 'Não')}")
+        report_lines.append(f"Observações: {st.session_state.get(f'rack_obs_{i}_{ticket_id}', '')}")
         report_lines.append("")
 
     report_lines.append("SUBTITLE: Access Point (AP)")
@@ -160,6 +161,7 @@ def get_report_data(ticket_id):
     report_lines.append(f"Identificar o setor onde será instalado*: {st.session_state.get(f'ap_setor_{ticket_id}', '')}")
     report_lines.append(f"Verificar as condições da Instalação (se possui infra ou não): {st.session_state.get(f'ap_condicoes_{ticket_id}', '')}")
     report_lines.append(f"** Altura que será instalado / distância do rack até o ponto de instalação: {st.session_state.get(f'ap_distancia_{ticket_id}', '')}")
+    report_lines.append(f"Observações: {st.session_state.get(f'ap_obs_{ticket_id}', '')}")
     
     return report_lines
 
@@ -246,16 +248,20 @@ def display_checklist(ticket_id):
             st.radio("Rack está em bom estado", ("Sim", "Não"), key=f'rack_estado_{i}_{ticket_id}', horizontal=True)
             st.radio("Rack está organizado", ("Sim", "Não"), key=f'rack_organizado_{i}_{ticket_id}', horizontal=True)
             st.radio("Equipamentos e cabeamentos identificados", ("Sim", "Não"), key=f'rack_identificado_{i}_{ticket_id}', horizontal=True)
+        
+        st.text_area("Observações", key=f'rack_obs_{i}_{ticket_id}', height=100)
+
         if i < num_racks:
             st.markdown("---")
     st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown('<div class="card">', unsafe_allow_html=True)
     st.subheader("Access Point (AP)")
-    st.text_input("Verificar a quantidade de APs", key=f'ap_quantidade_{ticket_id}')
+    st.number_input("Verificar a quantidade de APs", min_value=0, step=1, key=f'ap_quantidade_{ticket_id}')
     st.text_input("Identificar o setor onde será instalado*", help="Setor onde o novo AP ficará", key=f'ap_setor_{ticket_id}')
     st.text_input("Verificar as condições da Instalação (se possui infra ou não)", help="Ex: Possui infra, não possui, precisa de canaleta, etc.", key=f'ap_condicoes_{ticket_id}')
     st.text_input("** Altura que será instalado / distância do rack até o ponto de instalação", help="Ex: Teto 2.8m / 15m de distância do rack", key=f'ap_distancia_{ticket_id}')
+    st.text_area("Observações", key=f'ap_obs_{ticket_id}', height=100)
     st.markdown('</div>', unsafe_allow_html=True)
     
     st.markdown("---")
