@@ -4,7 +4,7 @@ import datetime
 # --- Configuração da Página ---
 st.set_page_config(
     page_title="Checklist Help Desk",
-    page_icon="✨",
+    page_icon="",
     layout="wide",
 )
 
