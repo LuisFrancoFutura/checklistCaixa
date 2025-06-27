@@ -106,6 +106,12 @@ def load_css():
             padding: 15px;
         }
         
+        /* Correção para visibilidade dos labels em todos os temas */
+        [data-testid="stWidgetLabel"] label {
+            color: #0d2a4b !important;
+            font-weight: 500 !important;
+        }
+
         [data-testid="stTextInput"] input, 
         [data-testid="stNumberInput"] input,
         [data-testid="stTextArea"] textarea {
@@ -309,32 +315,6 @@ def display_checklist(ticket_id, data_source, is_disabled=False):
         st.text_input("Verificar as condições da Instalação (se possui infra ou não)", help="Ex: Possui infra, não possui, precisa de canaleta, etc.", key=f'ap_condicoes_{ticket_id}', value=data_source.get('ap_condicoes', ''), disabled=is_disabled)
         st.text_input("** Altura que será instalado / distância do rack até o ponto de instalação", help="Ex: Teto 2.8m / 15m de distância do rack", key=f'ap_distancia_{ticket_id}', value=data_source.get('ap_distancia', ''), disabled=is_disabled)
     
-    with st.expander("Checklist de Verificação no Local (Analista)"):
-        def get_key(base_key):
-            return f"{base_key}_{ticket_id}"
-
-        st.markdown("##### - FOTO GERAL DA SALA ONLINE")
-        st.checkbox("Tirar duas fotos pegando os dois cantos da sala.", key=get_key("analyst_chk_1"), value=data_source.get(get_key("analyst_chk_1"), False), disabled=is_disabled)
-
-        st.markdown("##### - FOTOS DAS TOMADAS/RÉGUAS DO RACK")
-        st.checkbox("Quantas tomadas estão livres.", key=get_key("analyst_chk_2"), value=data_source.get(get_key("analyst_chk_2"), False), disabled=is_disabled)
-        st.checkbox("Verificar se há possibilidade de adicionar mais tomadas, se necessário.", key=get_key("analyst_chk_3"), value=data_source.get(get_key("analyst_chk_3"), False), disabled=is_disabled)
-
-        st.markdown("##### - FOTO DO RACK")
-        st.checkbox("Foto completa do rack (da base até o topo).", key=get_key("analyst_chk_4"), value=data_source.get(get_key("analyst_chk_4"), False), disabled=is_disabled)
-        st.checkbox("Quantos U’s estão livres.", key=get_key("analyst_chk_5"), value=data_source.get(get_key("analyst_chk_5"), False), disabled=is_disabled)
-        st.checkbox("Quantos U’s no total (tamanho do rack).", key=get_key("analyst_chk_6"), value=data_source.get(get_key("analyst_chk_6"), False), disabled=is_disabled)
-        st.checkbox("Verificar se os cabos e equipamentos estão identificados.", key=get_key("analyst_chk_7"), value=data_source.get(get_key("analyst_chk_7"), False), disabled=is_disabled)
-
-        st.markdown("##### - VERIFICAR QUANTOS APs JÁ EXISTEM")
-        st.checkbox("Tirar fotos amplas mostrando onde os APs estão instalados.", key=get_key("analyst_chk_8"), value=data_source.get(get_key("analyst_chk_8"), False), disabled=is_disabled)
-
-        st.markdown("##### - VERIFICAR INSTALAÇÃO DE NOVO AP")
-        st.checkbox("Verificar se já existe infraestrutura no local.", key=get_key("analyst_chk_9"), value=data_source.get(get_key("analyst_chk_9"), False), disabled=is_disabled)
-        st.checkbox(">>> Caso NÃO exista, alinhar com o gerente o ponto de instalação.", key=get_key("analyst_chk_10"), value=data_source.get(get_key("analyst_chk_10"), False), disabled=is_disabled)
-        st.checkbox("Medir a altura do teto.", key=get_key("analyst_chk_11"), value=data_source.get(get_key("analyst_chk_11"), False), disabled=is_disabled)
-        st.checkbox("Verificar a distância até a sala online (caso não tenha infraestrutura).", key=get_key("analyst_chk_12"), value=data_source.get(get_key("analyst_chk_12"), False), disabled=is_disabled)
-    
     st.markdown("---")
     
     # --- Seção de Ações (Concluir ou Exportar) ---
@@ -381,14 +361,21 @@ with st.sidebar:
     if st.session_state.mode == "Preenchimento":
         st.subheader("Adicionar Novos Chamados")
         with st.form("new_ticket_form", clear_on_submit=True):
-            new_tickets_input = st.text_area("Códigos dos Chamados (um por linha)", placeholder="CLAR-411\nCLAR-379\nCLAR-354").strip()
+            new_tickets_input = st.text_area("Códigos dos Chamados (um por linha)", placeholder="CLAR-411\n12345\nCLAR-354").strip()
             submitted = st.form_submit_button("Adicionar Chamados")
             if submitted and new_tickets_input:
                 ticket_ids = [tid.strip() for tid in new_tickets_input.split('\n') if tid.strip()]
                 added_count = 0
                 for ticket_id in ticket_ids:
-                    if ticket_id not in st.session_state.tickets:
-                        st.session_state.tickets[ticket_id] = {}
+                    # Formata o ID do chamado
+                    formatted_id = ticket_id.upper()
+                    if formatted_id.isdigit():
+                        formatted_id = f"CLAR-{formatted_id}"
+                    elif not formatted_id.startswith("CLAR-"):
+                         formatted_id = f"CLAR-{formatted_id}"
+
+                    if formatted_id not in st.session_state.tickets:
+                        st.session_state.tickets[formatted_id] = {}
                         added_count += 1
                 if added_count > 0:
                     st.success(f"{added_count} chamado(s) adicionado(s)!")
