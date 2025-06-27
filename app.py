@@ -89,13 +89,15 @@ def load_css():
         }
         
         [data-testid="stTextInput"] input, 
-        [data-testid="stNumberInput"] input {
+        [data-testid="stNumberInput"] input,
+        [data-testid="stTextArea"] textarea {
             border-radius: 8px;
             border: 1px solid #ccc;
             padding: 10px;
         }
         [data-testid="stTextInput"] input:focus, 
-        [data-testid="stNumberInput"] input:focus {
+        [data-testid="stNumberInput"] input:focus,
+        [data-testid="stTextArea"] textarea:focus {
             border-color: #0066cc;
             box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.25);
         }
@@ -297,30 +299,46 @@ with st.sidebar:
     st.header("Gestor de Chamados")
     
     with st.form("new_ticket_form", clear_on_submit=True):
-        new_ticket_id = st.text_input("Código do Chamado (ex: CLAR-123)", placeholder="CLAR-XXX").strip()
-        submitted = st.form_submit_button("Adicionar Chamado")
+        new_tickets_input = st.text_area("Códigos dos Chamados (um por linha)", placeholder="CLAR-411\nCLAR-379\nCLAR-354").strip()
+        submitted = st.form_submit_button("Adicionar Chamados")
         
-        if submitted and new_ticket_id:
-            if new_ticket_id not in st.session_state.tickets:
-                st.session_state.tickets[new_ticket_id] = {}
-                st.success(f"Chamado '{new_ticket_id}' adicionado!")
-            else:
-                st.warning(f"O chamado '{new_ticket_id}' já existe.")
+        if submitted and new_tickets_input:
+            ticket_ids = [tid.strip() for tid in new_tickets_input.split('\n') if tid.strip()]
+            added_count = 0
+            for ticket_id in ticket_ids:
+                if ticket_id not in st.session_state.tickets:
+                    st.session_state.tickets[ticket_id] = {}
+                    added_count += 1
+            if added_count > 0:
+                st.success(f"{added_count} chamado(s) adicionado(s)!")
+
 
     st.markdown("---")
     
-    st.header("Checklist do Analista")
-    st.info("Use esta lista para guiar o técnico em campo.")
+    st.header("CHECKLIST DE VERIFICAÇÃO NO LOCAL")
     
-    st.checkbox("FOTO GERAL DA SALA ONLINE (2 cantos)")
-    st.checkbox("FOTOS DAS TOMADAS/RÉGUAS DO RACK")
-    st.checkbox("FOTO COMPLETA DO RACK (base ao topo)")
-    st.checkbox("VERIFICAR QUANTOS APs JÁ EXISTEM")
-    with st.expander("Detalhes da Instalação de Novo AP"):
-        st.checkbox("Verificar se já existe infraestrutura no local")
-        st.checkbox("Alinhar ponto de instalação com o gerente (se necessário)")
-        st.checkbox("Medir a altura do teto")
-        st.checkbox("Verificar a distância até a sala online")
+    st.markdown("##### - FOTO GERAL DA SALA ONLINE")
+    st.checkbox("Tirar duas fotos pegando os dois cantos da sala.", key="analyst_chk_1")
+
+    st.markdown("##### - FOTOS DAS TOMADAS/RÉGUAS DO RACK")
+    st.checkbox("Quantas tomadas estão livres.", key="analyst_chk_2")
+    st.checkbox("Verificar se há possibilidade de adicionar mais tomadas, se necessário.", key="analyst_chk_3")
+
+    st.markdown("##### - FOTO DO RACK")
+    st.checkbox("Foto completa do rack (da base até o topo).", key="analyst_chk_4")
+    st.checkbox("Quantos U’s estão livres.", key="analyst_chk_5")
+    st.checkbox("Quantos U’s no total (tamanho do rack).", key="analyst_chk_6")
+    st.checkbox("Verificar se os cabos e equipamentos estão identificados.", key="analyst_chk_7")
+
+    st.markdown("##### - VERIFICAR QUANTOS APs JÁ EXISTEM")
+    st.checkbox("Tirar fotos amplas mostrando onde os APs estão instalados.", key="analyst_chk_8")
+
+    st.markdown("##### - VERIFICAR INSTALAÇÃO DE NOVO AP")
+    st.checkbox("Verificar se já existe infraestrutura no local.", key="analyst_chk_9")
+    st.checkbox(">>> Caso NÃO exista, alinhar com o gerente o ponto de instalação.", key="analyst_chk_10")
+    st.checkbox("Medir a altura do teto.", key="analyst_chk_11")
+    st.checkbox("Verificar a distância até a sala online (caso não tenha infraestrutura).", key="analyst_chk_12")
+
 
 # --- Área Principal ---
 st.title("Ferramenta de Checklist para Atividades de Campo")
