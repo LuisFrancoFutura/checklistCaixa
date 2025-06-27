@@ -122,8 +122,6 @@ def load_css():
 
 def get_report_data(ticket_id):
     """Coleta os dados do formulário e retorna uma lista de strings formatadas."""
-    now = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    
     agencia = st.session_state.get(f'agencia_{ticket_id}', '')
     cidade_uf = st.session_state.get(f'cidade_uf_{ticket_id}', '')
     endereco = st.session_state.get(f'endereco_{ticket_id}', '')
@@ -131,9 +129,9 @@ def get_report_data(ticket_id):
     
     report_lines = [
         "===============================================",
-        f"  CHECKLIST DE ATIVIDADE - CHAMADO: {ticket_id.upper()}",
+        "           Check list Caixa Econômica",
         "===============================================",
-        f"Data de Geração: {now}\n",
+        f"Chamado: {ticket_id.upper()}\n",
         "--- INFORMAÇÕES GERAIS DA AGÊNCIA ---",
         f"Agência: {agencia}",
         f"Cidade/UF: {cidade_uf}",
