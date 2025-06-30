@@ -16,6 +16,284 @@ from reportlab.lib.units import inch
 # --- Constante para o arquivo de histórico ---
 COMPLETED_FILE = "completed_checklists.json"
 
+# --- CSS Melhorado (mesmo do app principal) ---
+def load_admin_css():
+    """Carrega e injeta o CSS customizado melhorado para o painel administrativo."""
+    css = """
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* Reset e configurações base */
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+        }
+
+        body, .main {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+            background-color: #f8fafc !important;
+            line-height: 1.6 !important;
+            color: #1e293b !important;
+        }
+
+        /* Oculta a barra lateral do Streamlit */
+        [data-testid="stSidebar"] {
+            display: none !important;
+        }
+
+        /* Container principal */
+        .main .block-container {
+            padding-top: 2rem !important;
+            padding-bottom: 2rem !important;
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            max-width: 1200px !important;
+        }
+
+        /* Títulos melhorados */
+        h1, h2, h3, h4, h5, h6 {
+            color: #0f172a !important;
+            font-weight: 600 !important;
+            margin-bottom: 1rem !important;
+            line-height: 1.2 !important;
+        }
+
+        h1 {
+            font-size: 2.25rem !important;
+            margin-bottom: 1.5rem !important;
+        }
+
+        h2 {
+            font-size: 1.875rem !important;
+            margin-bottom: 1.25rem !important;
+        }
+
+        h3 {
+            font-size: 1.5rem !important;
+        }
+
+        h4 {
+            font-size: 1.25rem !important;
+        }
+
+        /* Botões melhorados */
+        .stButton > button, .stDownloadButton > button {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 12px !important;
+            padding: 12px 24px !important;
+            font-weight: 500 !important;
+            font-size: 1rem !important;
+            min-height: 48px !important;
+            width: 100% !important;
+            transition: all 0.2s ease !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        .stButton > button:hover, .stDownloadButton > button:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        /* Botão de logout com cor diferente */
+        .stButton > button[kind="secondary"] {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+        }
+
+        .stButton > button[kind="secondary"]:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+        }
+
+        /* Expanders melhorados */
+        [data-testid="stExpander"] {
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            margin-bottom: 1.5rem !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06) !important;
+            overflow: hidden !important;
+        }
+
+        [data-testid="stExpander"] summary {
+            font-size: 1.125rem !important;
+            font-weight: 600 !important;
+            color: #0f172a !important;
+            padding: 1.25rem 1.5rem !important;
+            background-color: #f8fafc !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            cursor: pointer !important;
+        }
+
+        [data-testid="stExpander"] summary:hover {
+            background-color: #f1f5f9 !important;
+        }
+
+        [data-testid="stExpander"] > div:last-child {
+            padding: 1.5rem !important;
+        }
+
+        /* Labels melhorados */
+        [data-testid="stWidgetLabel"] label {
+            color: #374151 !important;
+            font-weight: 500 !important;
+            font-size: 0.95rem !important;
+            margin-bottom: 0.5rem !important;
+        }
+
+        /* Inputs melhorados */
+        [data-testid="stTextInput"] input, 
+        [data-testid="stNumberInput"] input,
+        [data-testid="stTextArea"] textarea,
+        [data-testid="stSelectbox"] select {
+            border: 2px solid #e2e8f0 !important;
+            border-radius: 8px !important;
+            padding: 12px 16px !important;
+            font-size: 1rem !important;
+            min-height: 48px !important;
+            background-color: #ffffff !important;
+            transition: border-color 0.2s ease !important;
+        }
+
+        [data-testid="stTextInput"] input:focus, 
+        [data-testid="stNumberInput"] input:focus,
+        [data-testid="stTextArea"] textarea:focus,
+        [data-testid="stSelectbox"] select:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+            outline: none !important;
+        }
+
+        /* Formulários melhorados */
+        [data-testid="stForm"] {
+            background-color: #ffffff !important;
+            padding: 2rem !important;
+            border-radius: 16px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+        }
+
+        /* Tabs melhorados */
+        [data-testid="stTabs"] {
+            margin-bottom: 2rem !important;
+        }
+
+        [data-testid="stTabs"] button {
+            font-size: 1rem !important;
+            font-weight: 500 !important;
+            padding: 12px 24px !important;
+            border-radius: 8px 8px 0 0 !important;
+        }
+
+        /* Métricas melhoradas */
+        [data-testid="metric-container"] {
+            background-color: #ffffff !important;
+            padding: 1.5rem !important;
+            border-radius: 12px !important;
+            border: 1px solid #e2e8f0 !important;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Alertas e mensagens */
+        [data-testid="stAlert"] {
+            border-radius: 12px !important;
+            padding: 1rem 1.5rem !important;
+            margin: 1rem 0 !important;
+        }
+
+        /* Texto de informação melhorado */
+        .info-text {
+            background-color: #ffffff !important;
+            padding: 1rem !important;
+            border-radius: 8px !important;
+            border-left: 4px solid #3b82f6 !important;
+            margin: 0.5rem 0 !important;
+        }
+
+        /* Responsividade para mobile */
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+
+            .main .block-container {
+                padding-top: 1rem !important;
+                padding-left: 0.75rem !important;
+                padding-right: 0.75rem !important;
+            }
+
+            h1 {
+                font-size: 1.75rem !important;
+                text-align: center !important;
+            }
+
+            h2 {
+                font-size: 1.5rem !important;
+            }
+
+            /* Colunas empilhadas em mobile */
+            [data-testid="stHorizontalBlock"] {
+                flex-direction: column !important;
+                gap: 1rem !important;
+            }
+
+            [data-testid="stHorizontalBlock"] > div {
+                width: 100% !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* Botões maiores em mobile */
+            .stButton > button, .stDownloadButton > button {
+                min-height: 52px !important;
+                font-size: 1.05rem !important;
+                padding: 16px 24px !important;
+            }
+
+            /* Inputs maiores em mobile */
+            [data-testid="stTextInput"] input, 
+            [data-testid="stNumberInput"] input,
+            [data-testid="stTextArea"] textarea,
+            [data-testid="stSelectbox"] select {
+                min-height: 52px !important;
+                font-size: 1.05rem !important;
+                padding: 16px !important;
+            }
+
+            /* Gráficos responsivos */
+            [data-testid="stPlotlyChart"] {
+                width: 100% !important;
+                overflow-x: auto !important;
+            }
+
+            /* Formulários com menos padding em mobile */
+            [data-testid="stForm"] {
+                padding: 1.5rem 1rem !important;
+            }
+        }
+
+        /* Responsividade para telas muito pequenas */
+        @media (max-width: 480px) {
+            html {
+                font-size: 13px;
+            }
+
+            .main .block-container {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+
+            h1 {
+                font-size: 1.5rem !important;
+            }
+        }
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
 # --- Funções de Persistência (duplicadas para modularidade) ---
 def load_completed_tickets():
     if not os.path.exists(COMPLETED_FILE):
@@ -75,103 +353,180 @@ def create_docx_report(ticket_data):
 def display_review_checklist(ticket_id, data_source):
     """Renderiza o formulário em modo de leitura."""
     
-    with st.expander("Informações Gerais da Agência", expanded=True):
-        st.text(f"Agência: {data_source.get('agencia', 'N/A')}")
-        st.text(f"Cidade/UF: {data_source.get('cidade_uf', 'N/A')}")
-        st.text(f"Endereço: {data_source.get('endereco', 'N/A')}")
-        st.text(f"Quantidade de Racks: {int(data_source.get('num_racks', 1))}")
+    with st.expander("📋 Informações Gerais da Agência", expanded=True):
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.markdown(f"**🏢 Agência:** {data_source.get('agencia', 'N/A')}")
+            st.markdown(f"**📍 Endereço:** {data_source.get('endereco', 'N/A')}")
+        with col2:
+            st.markdown(f"**🌍 Cidade/UF:** {data_source.get('cidade_uf', 'N/A')}")
+            st.markdown(f"**🗄️ Quantidade de Racks:** {int(data_source.get('num_racks', 1))}")
 
     num_racks = int(data_source.get('num_racks', 1))
 
-    with st.expander("Detalhes dos Racks"):
+    with st.expander("🗄️ Detalhes dos Racks", expanded=True):
         for i in range(1, num_racks + 1):
-            st.markdown(f"#### Rack {i}")
-            st.text(f"Local: {data_source.get(f'rack_local_{i}', 'N/A')}")
-            st.text(f"Tamanho (U's): {data_source.get(f'rack_tamanho_{i}', 'N/A')}")
-            st.text(f"U's disponíveis: {data_source.get(f'rack_us_disponiveis_{i}', 'N/A')}")
-            st.text(f"Réguas de energia: {data_source.get(f'rack_reguas_{i}', 'N/A')}")
-            st.text(f"Tomadas disponíveis: {data_source.get(f'rack_tomadas_disponiveis_{i}', 'N/A')}")
-            st.text(f"Permite ampliação de réguas: {data_source.get(f'rack_ampliacao_reguas_{i}', 'N/A')}")
-            st.text(f"Bom estado: {data_source.get(f'rack_estado_{i}', 'N/A')}")
-            st.text(f"Organizado: {data_source.get(f'rack_organizado_{i}', 'N/A')}")
-            st.text(f"Identificado: {data_source.get(f'rack_identificado_{i}', 'N/A')}")
+            st.markdown(f"#### 📦 Rack {i}")
+            col1, col2 = st.columns([1, 1])
+            with col1:
+                st.markdown(f"**📍 Local:** {data_source.get(f'rack_local_{i}', 'N/A')}")
+                st.markdown(f"**📏 Tamanho (U's):** {data_source.get(f'rack_tamanho_{i}', 'N/A')}")
+                st.markdown(f"**📊 U's disponíveis:** {data_source.get(f'rack_us_disponiveis_{i}', 'N/A')}")
+                st.markdown(f"**⚡ Réguas de energia:** {data_source.get(f'rack_reguas_{i}', 'N/A')}")
+                st.markdown(f"**🔌 Tomadas disponíveis:** {data_source.get(f'rack_tomadas_disponiveis_{i}', 'N/A')}")
+            with col2:
+                st.markdown(f"**🔧 Permite ampliação de réguas:** {data_source.get(f'rack_ampliacao_reguas_{i}', 'N/A')}")
+                st.markdown(f"**✅ Bom estado:** {data_source.get(f'rack_estado_{i}', 'N/A')}")
+                st.markdown(f"**🗂️ Organizado:** {data_source.get(f'rack_organizado_{i}', 'N/A')}")
+                st.markdown(f"**🏷️ Identificado:** {data_source.get(f'rack_identificado_{i}', 'N/A')}")
             if i < num_racks: st.markdown("---")
             
-    with st.expander("Access Point (AP)"):
-        st.text(f"APs existentes: {data_source.get('ap_quantidade', 'N/A')}")
-        st.text(f"Setor de instalação: {data_source.get('ap_setor', 'N/A')}")
-        st.text(f"Condições da infra: {data_source.get('ap_condicoes', 'N/A')}")
-        st.text(f"Altura/Distância: {data_source.get('ap_distancia', 'N/A')}")
+    with st.expander("📡 Access Point (AP)", expanded=True):
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.markdown(f"**📊 APs existentes:** {data_source.get('ap_quantidade', 'N/A')}")
+            st.markdown(f"**🎯 Setor de instalação:** {data_source.get('ap_setor', 'N/A')}")
+        with col2:
+            st.markdown(f"**🔍 Condições da infra:** {data_source.get('ap_condicoes', 'N/A')}")
+            st.markdown(f"**📐 Altura/Distância:** {data_source.get('ap_distancia', 'N/A')}")
 
     st.markdown("---")
-    st.subheader("Exportar Relatório")
+    st.subheader("📄 Exportar Relatório")
     d_col1, d_col2, d_col3 = st.columns(3)
-    with d_col1: st.download_button("Baixar .TXT", "\n".join(get_report_data(data_source)), f"Checklist_{ticket_id.upper()}.txt", "text/plain")
-    with d_col2: st.download_button("Baixar .PDF", create_pdf_report(data_source), f"Checklist_{ticket_id.upper()}.pdf", "application/pdf")
-    with d_col3: st.download_button("Baixar .DOCX", create_docx_report(data_source), f"Checklist_{ticket_id.upper()}.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    with d_col1: 
+        st.download_button("📄 Baixar .TXT", "\n".join(get_report_data(data_source)), f"Checklist_{ticket_id.upper()}.txt", "text/plain")
+    with d_col2: 
+        st.download_button("📑 Baixar .PDF", create_pdf_report(data_source), f"Checklist_{ticket_id.upper()}.pdf", "application/pdf")
+    with d_col3: 
+        st.download_button("📝 Baixar .DOCX", create_docx_report(data_source), f"Checklist_{ticket_id.upper()}.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document")
 
 
 # --- Telas do Admin ---
 def page_admin_login():
-    st.header("Login do Painel Administrativo")
+    load_admin_css()
+    
+    st.title("🔐 Painel Administrativo")
+    st.header("🔑 Login")
+    
     with st.form("login_form"):
-        username = st.text_input("Usuário")
-        password = st.text_input("Senha", type="password")
-        submitted = st.form_submit_button("Login")
+        st.markdown("### 👤 Credenciais de Acesso")
+        username = st.text_input("👤 Usuário", placeholder="Digite seu usuário")
+        password = st.text_input("🔒 Senha", type="password", placeholder="Digite sua senha")
+        
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            submitted = st.form_submit_button("🚀 Entrar", type="primary")
+        with col2:
+            back_button = st.form_submit_button("⬅️ Voltar")
+            
         if submitted:
             if username == "admin" and password == "admin":
                 st.session_state.logged_in = True
                 st.session_state.page = 'admin_dashboard'
+                st.success("✅ Login realizado com sucesso!")
                 st.rerun()
             else:
-                st.error("Usuário ou senha incorretos")
-    if st.button("<< Voltar para o Início"):
-        st.session_state.page = 'main'
-        st.rerun()
+                st.error("❌ Usuário ou senha incorretos")
+                
+        if back_button:
+            st.session_state.page = 'main'
+            st.rerun()
 
 def page_admin_dashboard():
+    load_admin_css()
+    
     if not st.session_state.get('logged_in'):
         st.session_state.page = 'admin_login'
-        st.error("Acesso negado. Por favor, faça o login.")
+        st.error("❌ Acesso negado. Por favor, faça o login.")
         st.rerun()
     
-    st.title("Painel Administrativo")
-    if st.button("<< Sair"):
-        st.session_state.page = 'main'
-        del st.session_state.logged_in
-        st.rerun()
+    st.title("📊 Painel Administrativo")
+    
+    # Header com botão de logout
+    col_title, col_logout = st.columns([3, 1])
+    with col_logout:
+        if st.button("🚪 Sair", type="secondary"):
+            st.session_state.page = 'main'
+            if 'logged_in' in st.session_state:
+                del st.session_state.logged_in
+            st.rerun()
 
-    tab1, tab2 = st.tabs(["Revisão de Chamados", "Estatísticas"])
+    tab1, tab2 = st.tabs(["📋 Revisão de Chamados", "📈 Estatísticas"])
 
     with tab1:
-        st.header("Revisar Chamados Concluídos")
+        st.header("🔍 Revisar Chamados Concluídos")
         completed_tickets = load_completed_tickets()
+        
         if not completed_tickets:
-            st.info("Nenhum chamado concluído para revisar.")
+            st.info("ℹ️ Nenhum chamado concluído para revisar.")
         else:
-            options = ["Selecione..."] + list(completed_tickets.keys())
-            ticket_to_review = st.selectbox("Selecione um chamado:", options=options, key="review_select")
-            if ticket_to_review != "Selecione...":
-                st.subheader(f"Revisando Chamado: {ticket_to_review.upper()}")
+            st.success(f"✅ {len(completed_tickets)} chamados encontrados")
+            
+            options = ["Selecione um chamado..."] + list(completed_tickets.keys())
+            ticket_to_review = st.selectbox(
+                "🎫 Selecione um chamado:", 
+                options=options, 
+                key="review_select"
+            )
+            
+            if ticket_to_review != "Selecione um chamado...":
+                st.subheader(f"📋 Revisando Chamado: {ticket_to_review.upper()}")
                 display_review_checklist(ticket_to_review, completed_tickets[ticket_to_review])
 
     with tab2:
-        st.header("Estatísticas dos Checklists")
+        st.header("📊 Estatísticas dos Checklists")
         completed_tickets = load_completed_tickets()
+        
         if not completed_tickets:
-            st.warning("Não há dados de chamados concluídos para gerar estatísticas.")
+            st.warning("⚠️ Não há dados de chamados concluídos para gerar estatísticas.")
         else:
             df = pd.DataFrame.from_dict(completed_tickets, orient='index')
-            st.metric("Total de Chamados Concluídos", len(df))
+            
+            # Métricas principais
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("📊 Total de Chamados", len(df))
+            with col2:
+                total_racks = df['num_racks'].astype(int).sum()
+                st.metric("🗄️ Total de Racks", total_racks)
+            with col3:
+                avg_racks = df['num_racks'].astype(int).mean()
+                st.metric("📈 Média de Racks/Chamado", f"{avg_racks:.1f}")
 
-            st.subheader("Chamados por Localização (Cidade/UF)")
-            location_counts = df['cidade_uf'].value_counts().reset_index()
-            location_counts.columns = ['Localização', 'Contagem']
-            fig_loc = px.bar(location_counts, x='Localização', y='Contagem', title="Distribuição de Chamados")
-            st.plotly_chart(fig_loc, use_container_width=True)
+            st.markdown("---")
 
-            st.subheader("Análise de Status dos Racks")
-            status_keys = {'estado': 'Rack em bom estado', 'organizado': 'Rack organizado', 'identificado': 'Equipamentos identificados'}
+            # Gráfico de distribuição por localização
+            st.subheader("🌍 Chamados por Localização (Cidade/UF)")
+            if 'cidade_uf' in df.columns and not df['cidade_uf'].isna().all():
+                location_counts = df['cidade_uf'].value_counts().reset_index()
+                location_counts.columns = ['Localização', 'Contagem']
+                
+                fig_loc = px.bar(
+                    location_counts, 
+                    x='Localização', 
+                    y='Contagem', 
+                    title="📍 Distribuição de Chamados por Localização",
+                    color='Contagem',
+                    color_continuous_scale='Blues'
+                )
+                fig_loc.update_layout(
+                    xaxis_title="Localização",
+                    yaxis_title="Número de Chamados",
+                    showlegend=False
+                )
+                st.plotly_chart(fig_loc, use_container_width=True)
+            else:
+                st.info("ℹ️ Dados de localização não disponíveis")
+
+            st.markdown("---")
+
+            # Análise de status dos racks
+            st.subheader("🔍 Análise de Status dos Racks")
+            status_keys = {
+                'estado': '✅ Rack em bom estado', 
+                'organizado': '🗂️ Rack organizado', 
+                'identificado': '🏷️ Equipamentos identificados'
+            }
             status_counts = {key: {'Sim': 0, 'Não': 0} for key in status_keys}
             
             for _, ticket_data in df.iterrows():
@@ -179,15 +534,44 @@ def page_admin_dashboard():
                 for i in range(1, num_racks + 1):
                     for key, _ in status_keys.items():
                         status_val = ticket_data.get(f'rack_{key}_{i}', 'Não')
-                        if status_val in ['Sim', 'Não']: status_counts[key][status_val] += 1
+                        if status_val in ['Sim', 'Não']: 
+                            status_counts[key][status_val] += 1
 
             col1, col2, col3 = st.columns(3)
+            
             with col1:
-                fig1 = px.pie(values=list(status_counts['estado'].values()), names=list(status_counts['estado'].keys()), title=status_keys['estado'])
-                st.plotly_chart(fig1, use_container_width=True)
+                if sum(status_counts['estado'].values()) > 0:
+                    fig1 = px.pie(
+                        values=list(status_counts['estado'].values()), 
+                        names=list(status_counts['estado'].keys()), 
+                        title=status_keys['estado'],
+                        color_discrete_sequence=['#10b981', '#ef4444']
+                    )
+                    st.plotly_chart(fig1, use_container_width=True)
+                else:
+                    st.info("Sem dados")
+                    
             with col2:
-                fig2 = px.pie(values=list(status_counts['organizado'].values()), names=list(status_counts['organizado'].keys()), title=status_keys['organizado'])
-                st.plotly_chart(fig2, use_container_width=True)
+                if sum(status_counts['organizado'].values()) > 0:
+                    fig2 = px.pie(
+                        values=list(status_counts['organizado'].values()), 
+                        names=list(status_counts['organizado'].keys()), 
+                        title=status_keys['organizado'],
+                        color_discrete_sequence=['#10b981', '#ef4444']
+                    )
+                    st.plotly_chart(fig2, use_container_width=True)
+                else:
+                    st.info("Sem dados")
+                    
             with col3:
-                fig3 = px.pie(values=list(status_counts['identificado'].values()), names=list(status_counts['identificado'].keys()), title=status_keys['identificado'])
-                st.plotly_chart(fig3, use_container_width=True)
+                if sum(status_counts['identificado'].values()) > 0:
+                    fig3 = px.pie(
+                        values=list(status_counts['identificado'].values()), 
+                        names=list(status_counts['identificado'].keys()), 
+                        title=status_keys['identificado'],
+                        color_discrete_sequence=['#10b981', '#ef4444']
+                    )
+                    st.plotly_chart(fig3, use_container_width=True)
+                else:
+                    st.info("Sem dados")
+
